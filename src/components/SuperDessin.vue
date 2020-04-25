@@ -1,7 +1,12 @@
 <template>
   <div>
 
-    <svg id="mySvg" :width="width" :height="height" style="border:1px solid #d3d3d3;"></svg>
+    <svg id="mySvg" :width="width" :height="height" style="border:1px solid #d3d3d3; background-color: lightblue">
+        <rect :width="width/2" :height="height/2" style="fill:red" />
+        <rect :x="width/2" :width="width/2" :height="height/2" style="fill:yellow" />
+        <rect :x="width/2" :y="height/2" :width="width/2" :height="height/2" style="fill:mediumblue" />
+        <rect :y="height/2" :width="width/2" :height="height/2" style="fill:violet" />
+    </svg>
 
   </div>
 </template>
