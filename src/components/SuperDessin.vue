@@ -1,6 +1,6 @@
 <template>
   <div>
-    <canvas id="dessin" :width="width" :height="height" />
+    <canvas id="dessin" />
   </div>
 </template>
 
@@ -18,13 +18,19 @@ export default {
   },
   data: function () {
     return {
-      canvasCtx: null
+      canvas: null,
+      canvasCtx: null,
+      stats: {
+        countLineTo: 0
+      }
     }
   },
   watch: {
     angle: function () { this.drawDessin() },
     lineWidth:  function () { this.drawDessin() },
-    color:  function () { this.drawDessin() }
+    color:  function () { this.drawDessin() },
+    width:  function () { this.drawDessin() },
+    height:  function () { this.drawDessin() }
   },
   methods: {
     randomPoint: function () {
@@ -45,6 +51,7 @@ export default {
       this.canvasCtx.lineTo(tr[0].x, tr[0].y);
       this.canvasCtx.stroke();
 
+      this.stats.countLineTo += 3
     },
     segmentToLine: function (s) {
       return line(s.ps, s.pe)
@@ -63,15 +70,21 @@ export default {
         let destPoint = this.segmentToLine(s1r).intersect(this.segmentToLine(segments[1]))[0]
         let s = segment(segments[0].ps, destPoint)
         this.canvasCtx.lineTo(destPoint.x, destPoint.y);
+        this.stats.countLineTo += 1
         // svg.innerHTML += s.svg()
         segments = [segment(destPoint, segments[1].pe), segments[2], s]
       }
       this.canvasCtx.stroke();
     },
     drawDessin: function () {
+      let begin = new Date()
+      this.canvas.width = this.width
+      this.canvas.height = this.height
       this.canvasCtx.clearRect(0, 0, this.width, this.height)
       this.canvasCtx.lineWidth = this.lineWidth
       this.canvasCtx.strokeStyle = this.color
+      this.canvasCtx.lineJoin = 'round'
+      this.stats.countLineTo = 0
       let center = point(this.width/2, this.height/2)
       let centerRight = point(this.width*3/4, this.height/2)
       let seg1 = segment(center, centerRight)
@@ -96,11 +109,16 @@ export default {
 
         triangle = triangle.map(p => p.rotate(Math.PI/3,center))
       }
+      let end = new Date()
+      this.$emit('lineCount', this.stats.countLineTo)
+      this.$emit('renderDuration', end - begin)
     }
+
   },
   mounted: function () {
-      var dessin = document.getElementById('dessin')
-      var ctx = dessin.getContext("2d");
+      var canvas = document.getElementById('dessin')
+      this.canvas = canvas
+      var ctx = canvas.getContext("2d");
       this.canvasCtx = ctx
       this.drawDessin()
   }

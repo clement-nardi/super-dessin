@@ -1,24 +1,34 @@
 <template>
   <div id="app" style="display:flex;">
-    <div style="flex-grow:2; border:1px groove grey; margin-right: 10px;">
-      <div class="param-container">
-        <div class="param-label">Angle</div>
-        <el-slider class="param-slider" v-model="angle" :min="0.001" :max="0.524" :step="0.001" show-input/>
-      </div>
-      <div class="param-container">
-        <div class="param-label">Épaisseur</div>
-        <el-slider class="param-slider" v-model="lineWidth" :min="0.01" :max="2" :step="0.001" show-input/>
-      </div>
-      <div class="param-container">
-        <div class="param-label">Couleur</div>
+    <el-form label-width="auto" style="flex-grow:2;">
+      <el-form-item label="Angle">
+        <el-slider v-model="angle" :min="0.001" :max="0.524" :step="0.001" show-input/>
+      </el-form-item>
+      <el-form-item label="Épaisseur">
+        <el-slider v-model="lineWidth" :min="0.01" :max="2" :step="0.001" show-input/>
+      </el-form-item>
+      <el-form-item label="Couleur">
         <el-color-picker v-model="color" @active-change="(v) => color = v"></el-color-picker>
-      </div>
-    </div>
-    <SuperDessin :width="800"
-    :height="800"
+      </el-form-item>
+      <el-form-item label="Largeur">
+        <el-input v-model="width"></el-input>
+      </el-form-item>
+      <el-form-item label="Hauteur">
+        <el-input v-model="height"></el-input>
+      </el-form-item>
+      <el-form-item label="Statistiques">
+        <div>
+          Nombre de lignes: {{lineCount}} - Durée du rendu: {{renderDuration}}ms
+        </div>
+      </el-form-item>
+    </el-form>
+    <SuperDessin :width="width"
+    :height="height"
     :angle="angle"
     :lineWidth="lineWidth"
     :color="color"
+    @lineCount="(v) => lineCount = v"
+    @renderDuration="(v) => renderDuration = v"
     />
   </div>
 </template>
@@ -35,12 +45,24 @@ export default {
     return {
       angle: 0.011,
       lineWidth: 0.11,
-      color: '#2866B1'
+      color: '#2866B1',
+      width: 990,
+      height: 860,
+      lineCount: 0,
+      renderDuration: 0
     }
   },
   mounted: function () {
+    console.log(window.innerHeight)
+    window.addEventListener('resize', this.onResize);
+    this.onResize()
   },
   methods: {
+    onResize: function () {
+      console.log('onResize')
+      this.height = window.innerHeight - 4 // to avoid vertical scrollbar
+      this.width = Math.floor(this.height / Math.sqrt(0.75))
+    }
   }
 }
 </script>
@@ -52,18 +74,11 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 10px;
+  margin-top: 0px;
 }
-.param-container {
-  display: flex;
-  align-items: center;
+body {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
-.param-slider {
-  flex-grow: 2;
-  padding-right: 10px;
-}
-.param-label {
-  padding: 12px;
-  flex-basis: 120px;
-}
+
 </style>
