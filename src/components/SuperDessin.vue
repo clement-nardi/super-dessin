@@ -1,13 +1,6 @@
 <template>
   <div>
-
-    <svg id="mySvg" :width="width" :height="height" style="border:1px solid #d3d3d3; background-color: lightblue">
-        <rect :width="width/2" :height="height/2" style="fill:red" />
-        <rect :x="width/2" :width="width/2" :height="height/2" style="fill:yellow" />
-        <rect :x="width/2" :y="height/2" :width="width/2" :height="height/2" style="fill:mediumblue" />
-        <rect :y="height/2" :width="width/2" :height="height/2" style="fill:violet" />
-    </svg>
-
+    <canvas id="dessin" :width="width" :height="height" />
   </div>
 </template>
 
@@ -18,7 +11,20 @@ export default {
   name: 'SuperDessin',
   props: {
     width: Number,
-    height: Number
+    height: Number,
+    angle: Number,
+    lineWidth: Number,
+    color: String
+  },
+  data: function () {
+    return {
+      canvasCtx: null
+    }
+  },
+  watch: {
+    angle: function () { this.drawDessin() },
+    lineWidth:  function () { this.drawDessin() },
+    color:  function () { this.drawDessin() }
   },
   methods: {
     randomPoint: function () {
@@ -26,10 +32,19 @@ export default {
         Math.floor(Math.random()*this.height))
     },
     printTriangle: function (tr) {
+      /*
       var svg = document.getElementById("mySvg")
       svg.innerHTML += segment(tr[0],tr[1]).svg()
       svg.innerHTML += segment(tr[1],tr[2]).svg()
       svg.innerHTML += segment(tr[2],tr[0]).svg()
+      */
+      this.canvasCtx.beginPath()
+      this.canvasCtx.moveTo(tr[0].x, tr[0].y);
+      this.canvasCtx.lineTo(tr[1].x, tr[1].y);
+      this.canvasCtx.lineTo(tr[2].x, tr[2].y);
+      this.canvasCtx.lineTo(tr[0].x, tr[0].y);
+      this.canvasCtx.stroke();
+
     },
     segmentToLine: function (s) {
       return line(s.ps, s.pe)
@@ -39,20 +54,24 @@ export default {
       if (!clockwise) {
         tr = [tr_[0], tr_[2], tr_[1]]
       }
-      var svg = document.getElementById("mySvg")
       let segments = [segment(tr[0],tr[1]), segment(tr[1],tr[2]), segment(tr[2],tr[0])]
-      while (segments[0].length > 3) {
-        let angle = (clockwise?1:-1) * 0.10
+      this.canvasCtx.beginPath()
+      this.canvasCtx.moveTo(tr[0].x, tr[0].y);
+      while (segments[0].length > 1) {
+        let angle = (clockwise?1:-1) * this.angle
         let s1r = segments[0].rotate(angle, segments[0].ps)
         let destPoint = this.segmentToLine(s1r).intersect(this.segmentToLine(segments[1]))[0]
         let s = segment(segments[0].ps, destPoint)
-        svg.innerHTML += s.svg()
+        this.canvasCtx.lineTo(destPoint.x, destPoint.y);
+        // svg.innerHTML += s.svg()
         segments = [segment(destPoint, segments[1].pe), segments[2], s]
       }
-    }
-  },
-  mounted: function () {
-
+      this.canvasCtx.stroke();
+    },
+    drawDessin: function () {
+      this.canvasCtx.clearRect(0, 0, this.width, this.height)
+      this.canvasCtx.lineWidth = this.lineWidth
+      this.canvasCtx.strokeStyle = this.color
       let center = point(this.width/2, this.height/2)
       let centerRight = point(this.width*3/4, this.height/2)
       let seg1 = segment(center, centerRight)
@@ -77,9 +96,14 @@ export default {
 
         triangle = triangle.map(p => p.rotate(Math.PI/3,center))
       }
-
+    }
+  },
+  mounted: function () {
+      var dessin = document.getElementById('dessin')
+      var ctx = dessin.getContext("2d");
+      this.canvasCtx = ctx
+      this.drawDessin()
   }
-
 }
 </script>
 
