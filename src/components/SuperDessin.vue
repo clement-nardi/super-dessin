@@ -14,7 +14,8 @@ export default {
     height: Number,
     angle: Number,
     lineWidth: Number,
-    color: String
+    color: String,
+    circularDivider: Number
   },
   data: function () {
     return {
@@ -30,7 +31,8 @@ export default {
     lineWidth:  function () { this.drawDessin() },
     color:  function () { this.drawDessin() },
     width:  function () { this.drawDessin() },
-    height:  function () { this.drawDessin() }
+    height:  function () { this.drawDessin() },
+    circularDivider:  function () { this.drawDessin() }
   },
   methods: {
     randomPoint: function () {
@@ -88,10 +90,10 @@ export default {
       let center = point(this.width/2, this.height/2)
       let centerRight = point(this.width*3/4, this.height/2)
       let seg1 = segment(center, centerRight)
-      let seg2 = seg1.rotate(Math.PI/3, center)
+      let seg2 = seg1.rotate(2*Math.PI/this.circularDivider, center)
 
       let triangle = [center, centerRight, seg2.pe]
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < this.circularDivider; i++) {
         this.printTriangle(triangle)
         this.fillTriangle(triangle, i%2)
 
@@ -99,15 +101,15 @@ export default {
         this.printTriangle(tr2)
         this.fillTriangle(tr2, i%2)
 
-        let tr3 = tr2.map(p => p.rotate(Math.PI/3, tr2[0]))
+        let tr3 = triangle.map(p => p.translate(vector(triangle[0], triangle[2])))
         this.printTriangle(tr3)
-        this.fillTriangle(tr3, (i+1)%2)
+        this.fillTriangle(tr3, i%2)
 
-        let tr4 = tr2.map(p => p.rotate(-Math.PI/3, tr2[0]))
+        let tr4 = [tr2[0], tr2[2], tr3[0]]
         this.printTriangle(tr4)
         this.fillTriangle(tr4, (i+1)%2)
 
-        triangle = triangle.map(p => p.rotate(Math.PI/3,center))
+        triangle = triangle.map(p => p.rotate(2*Math.PI/this.circularDivider,center))
       }
       let end = new Date()
       this.$emit('lineCount', this.stats.countLineTo)

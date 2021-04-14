@@ -7,6 +7,9 @@
       <el-form-item label="Épaisseur">
         <el-slider v-model="lineWidth" :min="0.01" :max="2" :step="0.001" show-input/>
       </el-form-item>
+      <el-form-item label="Répétitions circulaires">
+        <el-slider v-model="circularDivider" :min="1" :max="32" :step="1" show-input/>
+      </el-form-item>
       <el-form-item label="Couleur">
         <el-color-picker v-model="color" @active-change="(v) => color = v"></el-color-picker>
       </el-form-item>
@@ -27,6 +30,7 @@
     :angle="angle"
     :lineWidth="lineWidth"
     :color="color"
+    :circularDivider="circularDivider"
     @lineCount="(v) => lineCount = v"
     @renderDuration="(v) => renderDuration = v"
     />
@@ -49,7 +53,8 @@ export default {
       width: 990,
       height: 860,
       lineCount: 0,
-      renderDuration: 0
+      renderDuration: 0,
+      circularDivider: 6
     }
   },
   mounted: function () {
