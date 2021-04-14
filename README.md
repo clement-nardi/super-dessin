@@ -1,5 +1,9 @@
 # super-dessins
 
+## Release
+
+Super dessin can be found at [super-dessin.nardi.fr](super-dessin.nardi.fr)
+
 ## Project setup
 ```
 npm install
